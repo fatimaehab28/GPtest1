@@ -18,7 +18,7 @@ namespace tbackendgp.Models
         //public Department Department { get; set; }
 
         [ForeignKey("UserType")]
-        public int UserTypeId { get; set; }
+        public int UserTypeId { get; set; } 
         public UserType UserType { get; set; }
 
         public IdentityCard IdentityCard { get; set; }

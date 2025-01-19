@@ -100,10 +100,13 @@ namespace tbackendgp.Controllers
                 return BadRequest("Email already exists");
             }
 
+            
+
             var userToCreate = new User()
             {
                 Name = userForRegisterDto.Name,
                 Email = userForRegisterDto.Email,
+
                 UserTypeId = userForRegisterDto.UserTypeId,
             };
 
@@ -119,5 +122,15 @@ namespace tbackendgp.Controllers
             return Ok();
 
         }
+
+
+
+
+
+
+
+
+
+
     }
 }

@@ -14,7 +14,9 @@ namespace tbackendgp.Dtos
         public string Email { get; set; }
         public string Password { get; set; }
         //public int DepartmentId { get; set; }
-        public int UserTypeId { get; set; }
+        public int UserTypeId { get; set; } 
+
+
 
         public string Code { get; set; }
         public int Gender { get; set; }

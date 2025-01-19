@@ -10,3 +10,10 @@ namespace tbackendgp.Data.IRepository
         Task<bool> UserExist(string username);
     }
 }
+
+
+
+
+
+
+
