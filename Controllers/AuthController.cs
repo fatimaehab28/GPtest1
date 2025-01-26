@@ -75,7 +75,7 @@ namespace tbackendgp.Controllers
         //[HttpGet("register")]
         //public async Task<IActionResult> Register()
         //{
-           
+
 
         //    var userTypes = await _userTypeRepository.GetAllAsync();
         //    if (userTypes == null || !userTypes.Any())
