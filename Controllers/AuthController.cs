@@ -72,22 +72,22 @@ namespace tbackendgp.Controllers
             });
         }
 
-        //[HttpGet("register")]
-        //public async Task<IActionResult> Register()
-        //{
+        [HttpGet("register")]
+        public async Task<IActionResult> Register()
+        {
            
 
-        //    var userTypes = await _userTypeRepository.GetAllAsync();
-        //    if (userTypes == null || !userTypes.Any())
-        //    {
-        //        return NotFound("No user types found");
-        //    }
+            var userTypes = await _userTypeRepository.GetAllAsync();
+            if (userTypes == null || !userTypes.Any())
+            {
+                return NotFound("No user types found");
+            }
 
-        //    return Ok(new
-        //    {
-        //        roles = userTypes
-        //    });
-        //}
+            return Ok(new
+            {
+                roles = userTypes
+            });
+        }
 
 
         [HttpPost("register")]
