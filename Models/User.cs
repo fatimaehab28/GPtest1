@@ -23,6 +23,8 @@ namespace tbackendgp.Models
 
         public IdentityCard IdentityCard { get; set; }
 
+        public int Gender { get; set; }
+
         //public ICollection<StudentCourse> StudentCourse { get; set; }
 
     }
