@@ -13,13 +13,21 @@ namespace tbackendgp.Data
         public DbSet<UserType> UserType { get; set; }
         public DbSet<IdentityCard> IdentityCard { get; set; }
 
+        public DbSet<Property> Properties { get; set; }
 
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
                 .Property(u => u.UserTypeId)
                 .HasDefaultValue(2);
+
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Property>()
+                .HasIndex(p => p.PropertyName)
+                .IsUnique(); // Ensure unique property names if required
 
             base.OnModelCreating(modelBuilder);
         }
