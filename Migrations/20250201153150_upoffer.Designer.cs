@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using tbackendgp.Data;
 
@@ -11,9 +12,11 @@ using tbackendgp.Data;
 namespace tbackendgp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250201153150_upoffer")]
+    partial class upoffer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,57 +44,24 @@ namespace tbackendgp.Migrations
 
             modelBuilder.Entity("tbackendgp.Models.Property", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("PropertyID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PropertyID"));
 
-                    b.Property<double>("AnnualGrossRent")
-                        .HasColumnType("float");
-
-                    b.Property<double>("AnnualGrossYield")
-                        .HasColumnType("float");
-
-                    b.Property<double>("AppreciationRate")
-                        .HasColumnType("float");
-
-                    b.Property<double>("AppreciationValue")
-                        .HasColumnType("float");
-
-                    b.Property<double>("AvailablePrice")
-                        .HasColumnType("float");
-
-                    b.Property<double>("CurrentRent")
-                        .HasColumnType("float");
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("FloorNumber")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("FundingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("FundingPercentage")
-                        .HasColumnType("float");
-
-                    b.Property<string>("FundingStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("MaintenanceFees")
-                        .HasColumnType("float");
-
-                    b.Property<double>("ManagementFees")
-                        .HasColumnType("float");
-
-                    b.Property<double>("NetRentalIncome")
-                        .HasColumnType("float");
-
-                    b.Property<double>("NetYield")
+                    b.Property<double>("InvestmentPercentage")
                         .HasColumnType("float");
 
                     b.Property<int?>("NumOfBathrooms")
@@ -100,26 +70,13 @@ namespace tbackendgp.Migrations
                     b.Property<int?>("NumOfRooms")
                         .HasColumnType("int");
 
-                    b.Property<int>("NumberOfInvestors")
+                    b.Property<int>("NumberOfShares")
                         .HasColumnType("int");
 
-                    b.Property<double>("PriceOfMeterSquare")
+                    b.Property<double>("Price")
                         .HasColumnType("float");
-
-                    b.Property<double>("ProjectedNetYield")
-                        .HasColumnType("float");
-
-                    b.Property<string>("PropertyAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("PropertyArea")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("PropertyLatitude")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("PropertyLongitude")
                         .HasColumnType("float");
 
                     b.Property<string>("PropertyName")
@@ -131,34 +88,18 @@ namespace tbackendgp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("PropertyPrice")
-                        .HasColumnType("float");
-
                     b.Property<string>("PropertyType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("PropertyValueGrowth")
+                    b.Property<double>("RentalIncome")
                         .HasColumnType("float");
 
-                    b.Property<double>("PropertyValueGrowthPercentage")
-                        .HasColumnType("float");
-
-                    b.Property<string>("RentingStatus")
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SellingStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("ServiceFees")
-                        .HasColumnType("float");
-
-                    b.Property<double>("TotalInvestmentReturn")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
+                    b.HasKey("PropertyID");
 
                     b.HasIndex("PropertyName")
                         .IsUnique();
@@ -174,26 +115,18 @@ namespace tbackendgp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OfferID"));
 
-                    b.Property<double>("AppreciationRate")
-                        .HasColumnType("float");
-
-                    b.Property<double>("CurrentRent")
-                        .HasColumnType("float");
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("FloorNumber")
                         .HasColumnType("int");
-
-                    b.Property<double>("FundingPercentage")
-                        .HasColumnType("float");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("MaintenanceFees")
-                        .HasColumnType("float");
-
-                    b.Property<double>("ManagementFees")
+                    b.Property<double>("InvestmentPercentage")
                         .HasColumnType("float");
 
                     b.Property<int?>("NumOfBathrooms")
@@ -202,27 +135,13 @@ namespace tbackendgp.Migrations
                     b.Property<int?>("NumOfRooms")
                         .HasColumnType("int");
 
-                    b.Property<int>("NumberOfInvestors")
+                    b.Property<int>("NumberOfShares")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("OfferDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OfferStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PropertyAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<double?>("PropertyArea")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("PropertyLatitude")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("PropertyLongitude")
                         .HasColumnType("float");
 
                     b.Property<string>("PropertyName")
@@ -234,15 +153,16 @@ namespace tbackendgp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("PropertyPrice")
-                        .HasColumnType("float");
-
                     b.Property<string>("PropertyType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("ServiceFees")
+                    b.Property<double>("RentalIncome")
                         .HasColumnType("float");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserID")
                         .HasColumnType("int");

@@ -1,50 +1,45 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using tbackendgp.Data.IRepository;
 using tbackendgp.Models;
-
-
+using Microsoft.Extensions.Configuration;
 
 namespace tbackendgp.Data
 {
     public class AuthRepository : IAuthRepository
     {
         private readonly DataContext _db;
+        private readonly IConfiguration _config;
 
-        public AuthRepository(DataContext db)
+        public AuthRepository(DataContext db, IConfiguration config)
         {
             _db = db;
+            _config = config;
         }
 
         public async Task<User> Login(string email, string password)
         {
-            var user = await _db.User.Include(u => u.UserType).FirstOrDefaultAsync(x => x.Email == email);
+            var user = await _db.User
+                .Include(u => u.UserType)  // 🔥 Ensures UserType is included in the query
+                .FirstOrDefaultAsync(x => x.Email == email);
 
-            if (user == null)
-            {
+            if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
                 return null;
-            }
-
-
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-            {
-                return null;
-            }
 
             return user;
         }
+
 
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
             {
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                for (int i = 0; i < computedHash.Length; i++)
-                {
-                    if (computedHash[i] != passwordHash[i])
-                        return false;
-                }
+                return computedHash.SequenceEqual(passwordHash);
             }
-            return true;
         }
 
         public async Task<User> Register(User user, string password)
@@ -72,10 +67,9 @@ namespace tbackendgp.Data
 
         public async Task<bool> UserExist(string email)
         {
-            if (await _db.User.AnyAsync(x => x.Email == email))
-                return true;
-
-            return false;
+            return await _db.User.AnyAsync(x => x.Email == email);
         }
+
+        
     }
 }

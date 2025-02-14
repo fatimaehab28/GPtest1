@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using tbackendgp.Data;
 using tbackendgp.Models;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Http.Features;
 using tbackendgp.Data.IRepository;
-using tbackendgp.Data;
+using tbackendgp.Data.Repository;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +32,9 @@ builder.Services.AddScoped<IDataRepository<UserType>, DataRepository<UserType>>(
 builder.Services.AddScoped<IDataRepository<IdentityCard>, DataRepository<IdentityCard>>();
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IDataRepository<Property>, DataRepository<Property>>();
+
+builder.Services.AddScoped<IPropertyOfferRepository, PropertyOfferRepository>();
+builder.Services.AddScoped<IDataRepository<PropertyOffer>, DataRepository<PropertyOffer>>();
 
 
 builder.Services.AddControllersWithViews().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
@@ -73,3 +76,6 @@ app.UseStaticFiles();
 app.MapControllers();
 app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.Run();
+
+
+

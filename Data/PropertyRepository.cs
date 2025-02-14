@@ -29,10 +29,10 @@ namespace tbackendgp.Data
             return await _context.Properties.FindAsync(id);
         }
 
-        // 🟢 Get Available Properties
+        // 🟢 Get Available Properties (Based on SellingStatus)
         public async Task<IEnumerable<Property>> GetAvailablePropertiesAsync()
         {
-            return await _context.Properties.Where(p => p.Status == "Available").ToListAsync();
+            return await _context.Properties.Where(p => p.SellingStatus == "Available").ToListAsync();
         }
 
         // 🔵 Get Properties By Type
@@ -41,10 +41,22 @@ namespace tbackendgp.Data
             return await _context.Properties.Where(p => p.PropertyType == propertyType).ToListAsync();
         }
 
-        // 🟢 Get Properties By Status
-        public async Task<IEnumerable<Property>> GetPropertiesByStatusAsync(string status)
+        // 🟢 Get Properties By Selling Status
+        public async Task<IEnumerable<Property>> GetPropertiesBySellingStatusAsync(string sellingStatus)
         {
-            return await _context.Properties.Where(p => p.Status == status).ToListAsync();
+            return await _context.Properties.Where(p => p.SellingStatus == sellingStatus).ToListAsync();
+        }
+
+        // 🟢 Get Properties By Funding Status
+        public async Task<IEnumerable<Property>> GetPropertiesByFundingStatusAsync(string fundingStatus)
+        {
+            return await _context.Properties.Where(p => p.FundingStatus == fundingStatus).ToListAsync();
+        }
+
+        // 🟢 Get Properties By Renting Status
+        public async Task<IEnumerable<Property>> GetPropertiesByRentingStatusAsync(string rentingStatus)
+        {
+            return await _context.Properties.Where(p => p.RentingStatus == rentingStatus).ToListAsync();
         }
 
         // 🔴 Add Property (CREATE)
@@ -57,14 +69,13 @@ namespace tbackendgp.Data
         // 🔵 Update Property
         public async Task UpdatePropertyAsync(Property property)
         {
-            var existingProperty = await _context.Properties.FindAsync(property.PropertyID);
+            var existingProperty = await _context.Properties.FindAsync(property.Id);
             if (existingProperty != null)
             {
                 _context.Entry(existingProperty).CurrentValues.SetValues(property); // 🟢 Ensures tracking
                 await _context.SaveChangesAsync();
             }
         }
-
 
         // 🔴 Delete Property
         public async Task<bool> DeletePropertyAsync(int id)

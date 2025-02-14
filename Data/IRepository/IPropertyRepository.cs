@@ -8,9 +8,17 @@ namespace tbackendgp.Data.IRepository
     {
         Task<IEnumerable<Property>> GetAllPropertiesAsync();
         Task<Property> GetPropertyByIdAsync(int id);
-        Task<IEnumerable<Property>> GetAvailablePropertiesAsync();
+
+        // Filters based on property status
+        Task<IEnumerable<Property>> GetAvailablePropertiesAsync(); // Based on SellingStatus
+        Task<IEnumerable<Property>> GetPropertiesBySellingStatusAsync(string sellingStatus);
+        Task<IEnumerable<Property>> GetPropertiesByFundingStatusAsync(string fundingStatus);
+        Task<IEnumerable<Property>> GetPropertiesByRentingStatusAsync(string rentingStatus);
+
+        // Other property filters
         Task<IEnumerable<Property>> GetPropertiesByTypeAsync(string propertyType);
-        Task<IEnumerable<Property>> GetPropertiesByStatusAsync(string status);
+
+        // CRUD Operations
         Task AddPropertyAsync(Property property);
         Task UpdatePropertyAsync(Property property);
         Task<bool> DeletePropertyAsync(int id);

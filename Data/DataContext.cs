@@ -15,7 +15,9 @@ namespace tbackendgp.Data
 
         public DbSet<Property> Properties { get; set; }
 
-        
+        public DbSet<PropertyOffer> PropertyOffers { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
