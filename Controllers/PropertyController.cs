@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using tbackendgp.Models;
 using tbackendgp.Data.IRepository;
@@ -20,59 +21,81 @@ namespace tbackendgp.Controllers
 
         // 🟢 GET ALL PROPERTIES
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Property>>> GetAllProperties()
+        public async Task<ActionResult<IEnumerable<PropertyDTO>>> GetAllProperties()
         {
             var properties = await _propertyRepository.GetAllPropertiesAsync();
-            return Ok(properties);
+
+            var propertyDTOs = properties.Select(p => new PropertyDTO
+            {
+                PropertyName = p.PropertyName,
+                PropertyType = p.PropertyType,
+                PropertyAddress = new AddressDTO
+                {
+                    Street = p.PropertyAddress.Street,
+                    City = p.PropertyAddress.City,
+                    State = p.PropertyAddress.State,
+                    Country = p.PropertyAddress.Country
+                },
+                PropertyPrice = p.PropertyPrice,
+                FundingStatus = p.FundingStatus,
+                RentingStatus = p.RentingStatus,
+                FundingPercentage = p.FundingPercentage * 100,
+                AvailablePrice = p.AvailablePrice, // ✅ Include AvailablePrice
+
+                NumOfRooms = p.NumOfRooms,
+                NumOfBathrooms = p.NumOfBathrooms,
+                PropertyArea = p.PropertyArea,
+                FloorNumber = p.FloorNumber,
+                ImageUrl = p.ImageUrl,
+                PropertyOverview = p.PropertyOverview,
+                PropertyLongitude = p.PropertyLongitude,
+                PropertyLatitude = p.PropertyLatitude,
+                FundingDate = p.FundingDate
+            });
+
+            return Ok(propertyDTOs);
         }
 
         // 🔵 GET PROPERTY BY ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<Property>> GetPropertyById(int id)
+        public async Task<ActionResult<PropertyDTO>> GetPropertyById(int id)
         {
             var property = await _propertyRepository.GetPropertyByIdAsync(id);
             if (property == null) return NotFound();
-            return Ok(property);
-        }
 
-        // 🟢 GET AVAILABLE PROPERTIES (SellingStatus == "Available")
-        [HttpGet("available")]
-        public async Task<ActionResult<IEnumerable<Property>>> GetAvailableProperties()
-        {
-            var properties = await _propertyRepository.GetAvailablePropertiesAsync();
-            return Ok(properties);
-        }
+            var propertyDto = new PropertyDTO
+            {
+                PropertyName = property.PropertyName,
+                PropertyType = property.PropertyType,
+                PropertyAddress = new AddressDTO
+                {
+                    Street = property.PropertyAddress.Street,
+                    City = property.PropertyAddress.City,
+                    State = property.PropertyAddress.State,
+                    Country = property.PropertyAddress.Country
+                },
+                PropertyPrice = property.PropertyPrice,
+                FundingStatus = property.FundingStatus,
+                RentingStatus = property.RentingStatus,
+                FundingPercentage = property.FundingPercentage * 100,
+                AvailablePrice = property.AvailablePrice, // ✅ Include AvailablePrice
+                NumberOfInvestors = property.NumberOfInvestors,
+                PriceOfMeterSquare = property.PriceOfMeterSquare,
 
-        // 🔵 GET PROPERTIES BY TYPE
-        [HttpGet("type/{propertyType}")]
-        public async Task<ActionResult<IEnumerable<Property>>> GetPropertiesByType(string propertyType)
-        {
-            var properties = await _propertyRepository.GetPropertiesByTypeAsync(propertyType);
-            return Ok(properties);
-        }
 
-        // 🟢 GET PROPERTIES BY SELLING STATUS
-        [HttpGet("status/selling/{sellingStatus}")]
-        public async Task<ActionResult<IEnumerable<Property>>> GetPropertiesBySellingStatus(string sellingStatus)
-        {
-            var properties = await _propertyRepository.GetPropertiesBySellingStatusAsync(sellingStatus);
-            return Ok(properties);
-        }
 
-        // 🟢 GET PROPERTIES BY FUNDING STATUS
-        [HttpGet("status/funding/{fundingStatus}")]
-        public async Task<ActionResult<IEnumerable<Property>>> GetPropertiesByFundingStatus(string fundingStatus)
-        {
-            var properties = await _propertyRepository.GetPropertiesByFundingStatusAsync(fundingStatus);
-            return Ok(properties);
-        }
+                NumOfRooms = property.NumOfRooms,
+                NumOfBathrooms = property.NumOfBathrooms,
+                PropertyArea = property.PropertyArea,
+                FloorNumber = property.FloorNumber,
+                ImageUrl = property.ImageUrl,
+                PropertyOverview = property.PropertyOverview,
+                PropertyLongitude = property.PropertyLongitude,
+                PropertyLatitude = property.PropertyLatitude,
+                FundingDate = property.FundingDate
+            };
 
-        // 🟢 GET PROPERTIES BY RENTING STATUS
-        [HttpGet("status/renting/{rentingStatus}")]
-        public async Task<ActionResult<IEnumerable<Property>>> GetPropertiesByRentingStatus(string rentingStatus)
-        {
-            var properties = await _propertyRepository.GetPropertiesByRentingStatusAsync(rentingStatus);
-            return Ok(properties);
+            return Ok(propertyDto);
         }
 
         // 🔴 CREATE PROPERTY
@@ -83,12 +106,23 @@ namespace tbackendgp.Controllers
             {
                 PropertyName = dto.PropertyName,
                 PropertyType = dto.PropertyType,
-                PropertyAddress = dto.PropertyAddress,
+
+                PropertyAddress = new Address
+                {
+                    Street = dto.PropertyAddress.Street,
+                    City = dto.PropertyAddress.City,
+                    State = dto.PropertyAddress.State,
+                    Country = dto.PropertyAddress.Country
+                },
+
                 PropertyPrice = dto.PropertyPrice,
-                SellingStatus = "Available", // Always starts as "Available"
-                FundingStatus = dto.FundingStatus,
+                FundingStatus = "Not Funded",  // Ensure it is "Not Funded"
                 RentingStatus = dto.RentingStatus,
-                FundingPercentage = dto.FundingPercentage,
+                SellingStatus = "Available",
+
+                FundingPercentage = 0,  // Set funding percentage to 0
+                NumberOfInvestors = 0,  // Ensure no investors initially
+
                 NumOfRooms = dto.NumOfRooms,
                 NumOfBathrooms = dto.NumOfBathrooms,
                 PropertyArea = dto.PropertyArea,
@@ -97,47 +131,13 @@ namespace tbackendgp.Controllers
                 PropertyOverview = dto.PropertyOverview,
                 PropertyLongitude = dto.PropertyLongitude,
                 PropertyLatitude = dto.PropertyLatitude,
-                ServiceFees = dto.ServiceFees,
-                ManagementFees = dto.ManagementFees,
-                MaintenanceFees = dto.MaintenanceFees,
-                CurrentRent = dto.CurrentRent,
-                FundingDate = dto.FundingDate,
-                AppreciationRate = dto.AppreciationRate,
-
-                // 🟢 Automatically Initialized Fields
-                NumberOfInvestors = 0, // Always starts as 0
-                AvailablePrice = dto.PropertyPrice, // Initially the full property price
-
-                // 🟢 Computed Fields (Backend)
-                PriceOfMeterSquare = dto.PropertyArea.HasValue && dto.PropertyArea.Value > 0
-                    ? dto.PropertyPrice / dto.PropertyArea.Value
-                    : 0,
-
-                AnnualGrossRent = dto.CurrentRent * 12,
-
-                AnnualGrossYield = dto.PropertyPrice > 0
-                    ? (dto.CurrentRent * 12) / dto.PropertyPrice * 100
-                    : 0,
-
-                NetRentalIncome = (dto.CurrentRent * 12) - (dto.ServiceFees + dto.ManagementFees + dto.MaintenanceFees),
-
-                NetYield = dto.PropertyPrice > 0
-                    ? ((dto.CurrentRent * 12) - (dto.ServiceFees + dto.ManagementFees + dto.MaintenanceFees)) / dto.PropertyPrice * 100
-                    : 0,
-
-                AppreciationValue = dto.PropertyPrice * (dto.AppreciationRate / 100),
-
-                TotalInvestmentReturn = (dto.PropertyPrice * (dto.AppreciationRate / 100)) +
-                    ((dto.CurrentRent * 12) - (dto.ServiceFees + dto.ManagementFees + dto.MaintenanceFees)),
-
-                PropertyValueGrowthPercentage = dto.PropertyPrice > 0
-                    ? ((dto.PropertyPrice * (dto.AppreciationRate / 100)) / dto.PropertyPrice) * 100
-                    : 0
+                FundingDate = DateTime.Now
             };
 
             await _propertyRepository.AddPropertyAsync(newProperty);
             return CreatedAtAction(nameof(GetPropertyById), new { id = newProperty.Id }, newProperty);
         }
+
 
         // 🔵 UPDATE PROPERTY
         [HttpPut("{id}")]
@@ -146,14 +146,24 @@ namespace tbackendgp.Controllers
             var property = await _propertyRepository.GetPropertyByIdAsync(id);
             if (property == null) return NotFound();
 
-            // 🔵 Update fields
             property.PropertyName = dto.PropertyName;
             property.PropertyType = dto.PropertyType;
-            property.PropertyAddress = dto.PropertyAddress;
+
+            property.PropertyAddress = new Address
+            {
+                Street = dto.PropertyAddress.Street,
+                City = dto.PropertyAddress.City,
+                State = dto.PropertyAddress.State,
+                Country = dto.PropertyAddress.Country
+            };
+
             property.PropertyPrice = dto.PropertyPrice;
             property.FundingStatus = dto.FundingStatus;
             property.RentingStatus = dto.RentingStatus;
-            property.FundingPercentage = dto.FundingPercentage;
+
+            property.FundingPercentage = dto.FundingPercentage / 100m; // Convert percentage to decimal before storing
+            property.OperatingExpenses = dto.OperatingExpenses; 
+
             property.NumOfRooms = dto.NumOfRooms;
             property.NumOfBathrooms = dto.NumOfBathrooms;
             property.PropertyArea = dto.PropertyArea;
@@ -162,51 +172,22 @@ namespace tbackendgp.Controllers
             property.PropertyOverview = dto.PropertyOverview;
             property.PropertyLongitude = dto.PropertyLongitude;
             property.PropertyLatitude = dto.PropertyLatitude;
-            property.ServiceFees = dto.ServiceFees;
-            property.ManagementFees = dto.ManagementFees;
-            property.MaintenanceFees = dto.MaintenanceFees;
-            property.CurrentRent = dto.CurrentRent;
             property.FundingDate = dto.FundingDate;
-            property.AppreciationRate = dto.AppreciationRate;
 
-            // 🔵 Recalculate Fields (Backend)
-            property.PriceOfMeterSquare = dto.PropertyArea.HasValue && dto.PropertyArea.Value > 0
-                ? dto.PropertyPrice / dto.PropertyArea.Value
-                : 0;
-
-            property.AnnualGrossRent = dto.CurrentRent * 12;
-
-            property.AnnualGrossYield = dto.PropertyPrice > 0
-                ? (dto.CurrentRent * 12) / dto.PropertyPrice * 100
-                : 0;
-
-            property.NetRentalIncome = (dto.CurrentRent * 12) - (dto.ServiceFees + dto.ManagementFees + dto.MaintenanceFees);
-
-            property.NetYield = dto.PropertyPrice > 0
-                ? ((dto.CurrentRent * 12) - (dto.ServiceFees + dto.ManagementFees + dto.MaintenanceFees)) / dto.PropertyPrice * 100
-                : 0;
-
-            property.AppreciationValue = dto.PropertyPrice * (dto.AppreciationRate / 100);
-
-            property.TotalInvestmentReturn = (dto.PropertyPrice * (dto.AppreciationRate / 100)) +
-                ((dto.CurrentRent * 12) - (dto.ServiceFees + dto.ManagementFees + dto.MaintenanceFees));
-
-            property.PropertyValueGrowthPercentage = dto.PropertyPrice > 0
-                ? ((dto.PropertyPrice * (dto.AppreciationRate / 100)) / dto.PropertyPrice) * 100
-                : 0;
-
-            // 🔴 Ensure the update is saved
             await _propertyRepository.UpdatePropertyAsync(property);
             return NoContent();
         }
+
 
         // 🔴 DELETE PROPERTY
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProperty(int id)
         {
             var success = await _propertyRepository.DeletePropertyAsync(id);
-            if (!success) return NotFound();
-            return NoContent();
+            if (!success) return NotFound(new { message = "Property not found or already deleted." });
+
+            return Ok(new { message = "Property successfully deleted." });
         }
+
     }
 }

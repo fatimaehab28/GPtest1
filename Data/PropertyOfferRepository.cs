@@ -36,7 +36,6 @@ namespace tbackendgp.Data.Repository
             await _context.SaveChangesAsync();
         }
 
-        // 🔵 Accept Offer & Move Property to Public Listings
         public async Task<bool> AcceptOfferAsync(int offerId)
         {
             var offer = await _context.PropertyOffers.FindAsync(offerId);
@@ -47,13 +46,25 @@ namespace tbackendgp.Data.Repository
             {
                 PropertyName = offer.PropertyName,
                 PropertyType = offer.PropertyType,
-                PropertyAddress = offer.PropertyAddress,
+
+                // ✅ Copy Address Object Instead of a String
+                PropertyAddress = new Address
+                {
+                    Street = offer.PropertyAddress.Street,
+                    City = offer.PropertyAddress.City,
+                    State = offer.PropertyAddress.State,
+                    Country = offer.PropertyAddress.Country
+                },
+
                 NumberOfInvestors = offer.NumberOfInvestors,
                 PropertyPrice = offer.PropertyPrice,
                 SellingStatus = "Available",
                 FundingStatus = "Funding",
                 RentingStatus = "Not Rented",
-                FundingPercentage = offer.FundingPercentage,
+
+                // ✅ Convert stored decimal (0.25) back to percentage (25)
+                FundingPercentage = offer.FundingPercentage * 100,
+
                 NumOfRooms = offer.NumOfRooms,
                 NumOfBathrooms = offer.NumOfBathrooms,
                 PropertyArea = offer.PropertyArea,
@@ -66,6 +77,7 @@ namespace tbackendgp.Data.Repository
                 ServiceFees = offer.ServiceFees,
                 ManagementFees = offer.ManagementFees,
                 MaintenanceFees = offer.MaintenanceFees,
+                OperatingExpenses = offer.OperatingExpenses, // ✅ Added
                 FundingDate = DateTime.UtcNow
             };
 
@@ -77,6 +89,7 @@ namespace tbackendgp.Data.Repository
             await _context.SaveChangesAsync();
             return true;
         }
+
 
         // 🔴 Decline Offer
         public async Task<bool> DeclineOfferAsync(int offerId)

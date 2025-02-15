@@ -20,8 +20,11 @@ namespace tbackendgp.Models
         [Required]
         public string PropertyType { get; set; }
 
+       
+
         [Required]
-        public string PropertyAddress { get; set; }
+        public Address PropertyAddress { get; set; }
+
 
         [Required]
         public int NumberOfInvestors { get; set; } = 0;
@@ -32,7 +35,10 @@ namespace tbackendgp.Models
         [Required]
         public string OfferStatus { get; set; } = "Pending"; // "Pending", "Accepted", "Declined"
 
-        public double FundingPercentage { get; set; } = 0;
+        // ✅ Store as decimal (0.25 for 25%)
+        [Required]
+        [Column(TypeName = "decimal(5,2)")]
+        public decimal FundingPercentage { get; set; } = 0;
 
         public int? NumOfRooms { get; set; }
         public int? NumOfBathrooms { get; set; }
@@ -42,18 +48,21 @@ namespace tbackendgp.Models
         public string ImageUrl { get; set; }
         public string PropertyOverview { get; set; }
 
-        // Location
+        // 📍 Geolocation
         public double? PropertyLongitude { get; set; }
         public double? PropertyLatitude { get; set; }
 
-        // Rental & Financial Information
+        // 💰 Rental & Financial Information
         public double CurrentRent { get; set; } = 0;
         public double AnnualGrossRent => CurrentRent * 12;
         public double ServiceFees { get; set; } = 0;
         public double ManagementFees { get; set; } = 0;
         public double MaintenanceFees { get; set; } = 0;
-        public double AnnualNetIncome => AnnualGrossRent - (ServiceFees + ManagementFees + MaintenanceFees);
 
+        // ✅ Added Operating Expenses
+        public double OperatingExpenses { get; set; } = 0;
+
+        public double AnnualNetIncome => AnnualGrossRent - (ServiceFees + ManagementFees + MaintenanceFees + OperatingExpenses);
         public double AppreciationRate { get; set; } = 0;
         public double AppreciationValue => PropertyPrice * (AppreciationRate / 100);
         public DateTime OfferDate { get; set; } = DateTime.UtcNow;

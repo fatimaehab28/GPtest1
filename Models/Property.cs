@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Net;
 
 namespace tbackendgp.Models
 {
+    
     public class Property
     {
         [Key]
@@ -17,8 +19,10 @@ namespace tbackendgp.Models
         [Required]
         public string PropertyType { get; set; }
 
+       
+
         [Required]
-        public string PropertyAddress { get; set; }
+        public Address PropertyAddress { get; set; }
 
         public int NumberOfInvestors { get; set; } = 0;
 
@@ -34,7 +38,9 @@ namespace tbackendgp.Models
         [Required]
         public string RentingStatus { get; set; }
 
-        public double FundingPercentage { get; set; } = 0;
+        [Required]
+        [Column(TypeName = "decimal(5,2)")]
+        public decimal FundingPercentage { get; set; } = 0;
 
         public int? NumOfRooms { get; set; }
         public int? NumOfBathrooms { get; set; }
@@ -49,44 +55,62 @@ namespace tbackendgp.Models
         public double? PropertyLatitude { get; set; }
 
         // 💲 Pricing details
-        public double AvailablePrice { get; set; }
-
-        public double PriceOfMeterSquare { get; set; } // Must exist in the model
+        //public double AvailablePrice { get; set; }
+       // public double PriceOfMeterSquare { get; set; }
 
         // 📊 Yield & Growth calculations
         public double ProjectedNetYield { get; set; }
         public double PropertyValueGrowth { get; set; }
         public double CurrentRent { get; set; }
-
-        /// ✅ **Annual Gross Rent Formula**: **Annual Gross Rent = Monthly Rent × 12**
-        public double AnnualGrossRent { get; set; } // Must exist in the model
-
-        /// ✅ **Annual Gross Yield Formula**: **(Annual Rental Income / Purchase Price) * 100**
-        public double AnnualGrossYield { get; set; } // Must exist in the model
+        public double AnnualGrossRent { get; set; }
+        public double AnnualGrossYield { get; set; }
 
         // 💰 Fees & Expenses
         public double ServiceFees { get; set; }
         public double ManagementFees { get; set; }
         public double MaintenanceFees { get; set; }
 
-        /// ✅ **Net Rental Income Formula**: **Annual Rental Income - Total Operating Expenses**
-        public double NetRentalIncome { get; set; } // Must exist in the model
+        public double OperatingExpenses { get; set; }
 
-        /// ✅ **Net Yield Formula**: **(Net Rental Income / Purchase Price) * 100**
-        public double NetYield { get; set; } // Must exist in the model
+        public double NetRentalIncome { get; set; }
+        public double NetYield { get; set; }
 
-        /// ✅ **Appreciation Rate**
+
+
         public double AppreciationRate { get; set; }
-
-        /// ✅ **Appreciation Value Formula**: **(New Property Value - Initial Property Value)**
-        public double AppreciationValue { get; set; } // Must exist in the model
+        public double AppreciationValue { get; set; }
 
         public DateTime FundingDate { get; set; }
+        public double TotalInvestmentReturn { get; set; }
+        public double PropertyValueGrowthPercentage { get; set; }
 
-        /// ✅ **Total Investment Return Formula**: **Value Appreciation + Net Rental Income**
-        public double TotalInvestmentReturn { get; set; } // Must exist in the model
 
-        /// ✅ **Property Value Growth Formula**: **(New Property Value - Initial Property Value) / Initial Property Value * 100**
-        public double PropertyValueGrowthPercentage { get; set; } // Must exist in the model
+
+        public double AvailablePrice
+        {
+            get
+            {
+                return PropertyPrice * (1 - (double)FundingPercentage); 
+            }
+        }
+
+
+        public double PriceOfMeterSquare
+        {
+            get
+            {
+                return (PropertyArea.HasValue && PropertyArea.Value > 0)
+                    ? PropertyPrice / PropertyArea.Value
+                    : 0; // ✅ Prevents division by zero & handles null cases
+            }
+        }
+
+
+
+
+
+
+
+
     }
 }

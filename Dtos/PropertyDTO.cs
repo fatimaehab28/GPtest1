@@ -1,17 +1,45 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace tbackendgp.DTOs
 {
+    public class AddressDTO
+    {
+        [Required]
+        public string Street { get; set; }
+
+        [Required]
+        public string City { get; set; }
+
+        [Required]
+        public string State { get; set; }
+
+        [Required]
+        public string Country { get; set; } 
+    }
+
     public class PropertyDTO
     {
         // 📌 Required fields that the property manager MUST enter from the frontend
         public string PropertyName { get; set; }
         public string PropertyType { get; set; }
-        public string PropertyAddress { get; set; }
+
+       
+
+        [Required]
+        public AddressDTO PropertyAddress { get; set; }
+
         public double PropertyPrice { get; set; }
         public string FundingStatus { get; set; }
         public string RentingStatus { get; set; }
-        public double FundingPercentage { get; set; }
+
+        // ✅ Fix FundingPercentage to be formatted correctly
+        [Required]
+        [Range(0, 100, ErrorMessage = "Funding percentage must be between 0 and 100.")]
+        public decimal FundingPercentage { get; set; }
+
+        public double PriceOfMeterSquare { get; set; }
+
         public int? NumOfRooms { get; set; }
         public int? NumOfBathrooms { get; set; }
         public double? PropertyArea { get; set; }
@@ -24,6 +52,8 @@ namespace tbackendgp.DTOs
         public double ServiceFees { get; set; }
         public double ManagementFees { get; set; }
         public double MaintenanceFees { get; set; }
+
+        public double OperatingExpenses { get; set; }
         public double AppreciationRate { get; set; }
         public DateTime FundingDate { get; set; }
 
@@ -31,5 +61,6 @@ namespace tbackendgp.DTOs
         public string SellingStatus { get; set; } = "Available"; // Always starts as "Available"
         public int NumberOfInvestors { get; set; } = 0; // Always starts at 0
         public double AvailablePrice { get; set; } // Will be initialized in Controller
+
     }
 }
