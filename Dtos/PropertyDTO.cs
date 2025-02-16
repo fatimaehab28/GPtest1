@@ -15,16 +15,13 @@ namespace tbackendgp.DTOs
         public string State { get; set; }
 
         [Required]
-        public string Country { get; set; } 
+        public string Country { get; set; }
     }
 
     public class PropertyDTO
     {
-        // 📌 Required fields that the property manager MUST enter from the frontend
         public string PropertyName { get; set; }
         public string PropertyType { get; set; }
-
-       
 
         [Required]
         public AddressDTO PropertyAddress { get; set; }
@@ -33,7 +30,6 @@ namespace tbackendgp.DTOs
         public string FundingStatus { get; set; }
         public string RentingStatus { get; set; }
 
-        // ✅ Fix FundingPercentage to be formatted correctly
         [Required]
         [Range(0, 100, ErrorMessage = "Funding percentage must be between 0 and 100.")]
         public decimal FundingPercentage { get; set; }
@@ -52,15 +48,21 @@ namespace tbackendgp.DTOs
         public double ServiceFees { get; set; }
         public double ManagementFees { get; set; }
         public double MaintenanceFees { get; set; }
-
         public double OperatingExpenses { get; set; }
         public double AppreciationRate { get; set; }
         public DateTime FundingDate { get; set; }
+        public string SellingStatus { get; set; } = "Available";
+        public int NumberOfInvestors { get; set; } = 0;
+        public double AvailablePrice { get; set; }
 
-        // 🔵 Automatically Initialized Fields (Backend logic)
-        public string SellingStatus { get; set; } = "Available"; // Always starts as "Available"
-        public int NumberOfInvestors { get; set; } = 0; // Always starts at 0
-        public double AvailablePrice { get; set; } // Will be initialized in Controller
-
+        // 🟢 Computed fields from the Property model:
+        public double AnnualGrossYield { get; set; }
+        public double NetYield { get; set; }
+        public double NewPropertyPrice { get; set; }
+        public double AppreciationValue { get; set; }
+        public double NetRentalIncome { get; set; }
+        public double AnnualGrossRent { get; set; }
+        public double AnnualNetIncome { get; set; }
+        public double PropertyValueGrowthPercentage { get; set; }
     }
 }
