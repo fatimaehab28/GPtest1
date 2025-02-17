@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 using tbackendgp.Models;
 using tbackendgp.Data.IRepository;
 using tbackendgp.DTOs;
+using tbackendgp.Dtos;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.IO;
 
 namespace tbackendgp.Controllers
 {
@@ -13,21 +17,30 @@ namespace tbackendgp.Controllers
     public class PropertyController : ControllerBase
     {
         private readonly IPropertyRepository _propertyRepository;
+        private readonly string _imageFolderPath;
 
         public PropertyController(IPropertyRepository propertyRepository)
         {
             _propertyRepository = propertyRepository;
+            _imageFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Properties");
+
+            if (!Directory.Exists(_imageFolderPath))
+            {
+                Directory.CreateDirectory(_imageFolderPath);  // Ensure the folder exists
+            }
         }
 
-        // 🟢 GET ALL PROPERTIES
-        // 🟢 GET ALL PROPERTIES
+        // 🟢 GET ALL PROPERTIES (Retrieves Full Image URL)
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PropertyDTO>>> GetAllProperties()
         {
+            var baseUrl = $"{Request.Scheme}://{Request.Host}/Resources/Properties/";
+
             var properties = await _propertyRepository.GetAllPropertiesAsync();
 
             var propertyDTOs = properties.Select(p => new PropertyDTO
             {
+                Id = p.Id,
                 PropertyName = p.PropertyName,
                 PropertyType = p.PropertyType,
                 PropertyAddress = new AddressDTO
@@ -40,21 +53,17 @@ namespace tbackendgp.Controllers
                 PropertyPrice = p.PropertyPrice,
                 FundingStatus = p.FundingStatus,
                 RentingStatus = p.RentingStatus,
-                // Multiply by 100 to convert stored fraction to percentage for display:
                 FundingPercentage = p.FundingPercentage * 100,
                 AvailablePrice = p.AvailablePrice,
-
                 NumOfRooms = p.NumOfRooms,
                 NumOfBathrooms = p.NumOfBathrooms,
                 PropertyArea = p.PropertyArea,
                 FloorNumber = p.FloorNumber,
-                ImageUrl = p.ImageUrl,
+                ImageUrl = string.IsNullOrEmpty(p.ImageUrl) ? "" : baseUrl + p.ImageUrl, // Convert to full URL
                 PropertyOverview = p.PropertyOverview,
                 PropertyLongitude = p.PropertyLongitude,
                 PropertyLatitude = p.PropertyLatitude,
                 FundingDate = p.FundingDate,
-
-                // Financial fields
                 CurrentRent = p.CurrentRent,
                 ServiceFees = p.ServiceFees,
                 ManagementFees = p.ManagementFees,
@@ -63,13 +72,12 @@ namespace tbackendgp.Controllers
                 AppreciationRate = p.AppreciationRate,
                 NumberOfInvestors = p.NumberOfInvestors,
                 PriceOfMeterSquare = p.PriceOfMeterSquare,
-
-                // Computed fields (added here)
                 AnnualGrossYield = p.AnnualGrossYield,
                 NetYield = p.NetYield,
                 NewPropertyPrice = p.NewPropertyPrice,
                 AppreciationValue = p.AppreciationValue,
                 NetRentalIncome = p.NetRentalIncome,
+                yearlyInvestmentReturn = p.yearlyInvestmentReturn,
                 AnnualGrossRent = p.AnnualGrossRent,
                 AnnualNetIncome = p.AnnualNetIncome,
                 PropertyValueGrowthPercentage = p.PropertyValueGrowthPercentage
@@ -79,16 +87,17 @@ namespace tbackendgp.Controllers
         }
 
 
-        // 🔵 GET PROPERTY BY ID
+
         [HttpGet("{id}")]
         public async Task<ActionResult<PropertyDTO>> GetPropertyById(int id)
         {
             var property = await _propertyRepository.GetPropertyByIdAsync(id);
             if (property == null) return NotFound();
 
+            var baseUrl = $"{Request.Scheme}://{Request.Host}/Resources/Properties/";
+
             var propertyDto = new PropertyDTO
             {
-                // Basic fields
                 PropertyName = property.PropertyName,
                 PropertyType = property.PropertyType,
                 PropertyAddress = new AddressDTO
@@ -107,15 +116,13 @@ namespace tbackendgp.Controllers
                 NumOfBathrooms = property.NumOfBathrooms,
                 PropertyArea = property.PropertyArea,
                 FloorNumber = property.FloorNumber,
-                ImageUrl = property.ImageUrl,
+                ImageUrl = string.IsNullOrEmpty(property.ImageUrl) ? "" : baseUrl + property.ImageUrl, // Ensure Full URL is returned
                 PropertyOverview = property.PropertyOverview,
                 PropertyLongitude = property.PropertyLongitude,
                 PropertyLatitude = property.PropertyLatitude,
                 FundingDate = property.FundingDate,
                 SellingStatus = property.SellingStatus,
                 NumberOfInvestors = property.NumberOfInvestors,
-
-                // Financial fields
                 CurrentRent = property.CurrentRent,
                 ServiceFees = property.ServiceFees,
                 ManagementFees = property.ManagementFees,
@@ -123,13 +130,12 @@ namespace tbackendgp.Controllers
                 OperatingExpenses = property.OperatingExpenses,
                 AppreciationRate = property.AppreciationRate,
                 PriceOfMeterSquare = property.PriceOfMeterSquare,
-
-                // Computed fields
                 AnnualGrossYield = property.AnnualGrossYield,
                 NetYield = property.NetYield,
                 NewPropertyPrice = property.NewPropertyPrice,
                 AppreciationValue = property.AppreciationValue,
                 NetRentalIncome = property.NetRentalIncome,
+                yearlyInvestmentReturn = property.yearlyInvestmentReturn,
                 AnnualGrossRent = property.AnnualGrossRent,
                 AnnualNetIncome = property.AnnualNetIncome,
                 PropertyValueGrowthPercentage = property.PropertyValueGrowthPercentage
@@ -138,14 +144,42 @@ namespace tbackendgp.Controllers
             return Ok(propertyDto);
         }
 
-        // 🔴 CREATE PROPERTY
-        [HttpPost]
-        public async Task<ActionResult<Property>> CreateProperty([FromBody] PropertyDTO dto)
+
+        // 🔴 CREATE PROPERTY WITH IMAGE UPLOAD
+        [HttpPost("create")]
+        public async Task<ActionResult<Property>> CreateProperty([FromForm] CreateOrUpdatePropertyDTO dto, IFormFile? imageFile)
         {
+            if (dto == null)
+            {
+                return BadRequest(new { message = "Invalid property data." });
+            }
+
+            string imageUrl = "";
+
+            if (imageFile != null)
+            {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
+                var filePath = Path.Combine(_imageFolderPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                imageUrl = fileName; // Store only the file name, not full path
+            }
+
             var newProperty = new Property
             {
                 PropertyName = dto.PropertyName,
                 PropertyType = dto.PropertyType,
+                NumOfRooms = dto.NumOfRooms,
+                NumOfBathrooms = dto.NumOfBathrooms,
+                FloorNumber = dto.FloorNumber,
+                PropertyOverview = dto.PropertyOverview,
+                PropertyArea = dto.PropertyArea,
+                ImageUrl = imageUrl,  // Store the file name
+
                 PropertyAddress = new Address
                 {
                     Street = dto.PropertyAddress.Street,
@@ -153,46 +187,57 @@ namespace tbackendgp.Controllers
                     State = dto.PropertyAddress.State,
                     Country = dto.PropertyAddress.Country
                 },
-                PropertyPrice = dto.PropertyPrice,
-                // Convert percentage to fraction (ex: 10 becomes 0.1)
-                FundingPercentage = dto.FundingPercentage / 100m,
-                FundingStatus = "Not Funded",  // Or use dto.FundingStatus if desired
-                RentingStatus = dto.RentingStatus,
-                SellingStatus = "Available",
-                NumberOfInvestors = 0,
-
-                // Map financial fields for calculations:
-                CurrentRent = dto.CurrentRent,
-                ServiceFees = dto.ServiceFees,
-                ManagementFees = dto.ManagementFees,
-                MaintenanceFees = dto.MaintenanceFees,
-                OperatingExpenses = dto.OperatingExpenses,
-                AppreciationRate = dto.AppreciationRate,
-
-                NumOfRooms = dto.NumOfRooms,
-                NumOfBathrooms = dto.NumOfBathrooms,
-                PropertyArea = dto.PropertyArea,
-                FloorNumber = dto.FloorNumber,
-                ImageUrl = dto.ImageUrl,
-                PropertyOverview = dto.PropertyOverview,
                 PropertyLongitude = dto.PropertyLongitude,
                 PropertyLatitude = dto.PropertyLatitude,
-                FundingDate = DateTime.Now // or dto.FundingDate if preferred
+                PropertyPrice = dto.PropertyPrice,
+                CurrentRent = dto.CurrentRent,
+                ServiceFees = dto.ServiceFees,
+                MaintenanceFees = dto.MaintenanceFees,
+                ManagementFees = dto.ManagementFees,
+                OperatingExpenses = dto.OperatingExpenses,
+                AppreciationRate = dto.AppreciationRate,
+                FundingStatus = "Not Funded",
+                RentingStatus = "Vacant",
+                SellingStatus = "Available",
+                FundingPercentage = 0,
+                NumberOfInvestors = 0,
+                FundingDate = DateTime.Now
             };
 
             await _propertyRepository.AddPropertyAsync(newProperty);
+
             return CreatedAtAction(nameof(GetPropertyById), new { id = newProperty.Id }, newProperty);
         }
 
-        // 🔵 UPDATE PROPERTY
+        // 🔵 UPDATE PROPERTY (With Image Upload)
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProperty(int id, [FromBody] PropertyDTO dto)
+        public async Task<IActionResult> UpdateProperty(int id, [FromForm] CreateOrUpdatePropertyDTO dto, IFormFile? imageFile)
         {
             var property = await _propertyRepository.GetPropertyByIdAsync(id);
             if (property == null) return NotFound();
 
             property.PropertyName = dto.PropertyName;
             property.PropertyType = dto.PropertyType;
+            property.NumOfRooms = dto.NumOfRooms;
+            property.NumOfBathrooms = dto.NumOfBathrooms;
+            property.FloorNumber = dto.FloorNumber;
+            property.PropertyOverview = dto.PropertyOverview;
+            property.PropertyArea = dto.PropertyArea;
+
+            // Handle image upload
+            if (imageFile != null)
+            {
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
+                var filePath = Path.Combine(_imageFolderPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                property.ImageUrl = fileName; // Update new image path
+            }
+
             property.PropertyAddress = new Address
             {
                 Street = dto.PropertyAddress.Street,
@@ -200,29 +245,8 @@ namespace tbackendgp.Controllers
                 State = dto.PropertyAddress.State,
                 Country = dto.PropertyAddress.Country
             };
-
-            property.PropertyPrice = dto.PropertyPrice;
-            property.FundingStatus = dto.FundingStatus;
-            property.RentingStatus = dto.RentingStatus;
-            property.FundingPercentage = dto.FundingPercentage / 100m; // convert to fraction
-
-            // Update financial fields
-            property.CurrentRent = dto.CurrentRent;
-            property.ServiceFees = dto.ServiceFees;
-            property.ManagementFees = dto.ManagementFees;
-            property.MaintenanceFees = dto.MaintenanceFees;
-            property.OperatingExpenses = dto.OperatingExpenses;
-            property.AppreciationRate = dto.AppreciationRate;
-
-            property.NumOfRooms = dto.NumOfRooms;
-            property.NumOfBathrooms = dto.NumOfBathrooms;
-            property.PropertyArea = dto.PropertyArea;
-            property.FloorNumber = dto.FloorNumber;
-            property.ImageUrl = dto.ImageUrl;
-            property.PropertyOverview = dto.PropertyOverview;
             property.PropertyLongitude = dto.PropertyLongitude;
             property.PropertyLatitude = dto.PropertyLatitude;
-            property.FundingDate = dto.FundingDate;
 
             await _propertyRepository.UpdatePropertyAsync(property);
             return NoContent();
@@ -234,9 +258,7 @@ namespace tbackendgp.Controllers
         {
             var success = await _propertyRepository.DeletePropertyAsync(id);
             if (!success)
-            {
                 return NotFound(new { message = "Property not found or already deleted." });
-            }
 
             return Ok(new { message = "Property successfully deleted." });
         }

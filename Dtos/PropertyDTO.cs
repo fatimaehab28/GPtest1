@@ -20,6 +20,7 @@ namespace tbackendgp.DTOs
 
     public class PropertyDTO
     {
+        public int Id { get; set; }
         public string PropertyName { get; set; }
         public string PropertyType { get; set; }
 
@@ -61,6 +62,9 @@ namespace tbackendgp.DTOs
         public double NewPropertyPrice { get; set; }
         public double AppreciationValue { get; set; }
         public double NetRentalIncome { get; set; }
+
+        public double yearlyInvestmentReturn { get; set; }
+
         public double AnnualGrossRent { get; set; }
         public double AnnualNetIncome { get; set; }
         public double PropertyValueGrowthPercentage { get; set; }

@@ -21,6 +21,9 @@ namespace tbackendgp.Models
         public int? NumOfRooms { get; set; }
         public int? NumOfBathrooms { get; set; }
         public int? FloorNumber { get; set; }
+
+        [FileExtensions(Extensions = "jpg,jpeg,png")]
+        [DataType(DataType.ImageUrl)]
         public string ImageUrl { get; set; }
         public string PropertyOverview { get; set; }
 
@@ -40,12 +43,13 @@ namespace tbackendgp.Models
         public double OperatingExpenses { get; set; }
         public double AppreciationRate { get; set; }
 
-        // Computed properties with safeguards:
+        // ✅ Computed properties with safeguards:
+
         public double AnnualGrossYield
         {
             get
             {
-                return PropertyPrice == 0 ? 0 : ((CurrentRent * 12) / PropertyPrice) * 100;
+                return PropertyPrice > 0 ? ((CurrentRent * 12) / PropertyPrice) * 100 : 0;
             }
         }
 
@@ -53,7 +57,7 @@ namespace tbackendgp.Models
         {
             get
             {
-                return PropertyPrice == 0 ? 0 : (((CurrentRent * 12) - OperatingExpenses) / PropertyPrice) * 100;
+                return PropertyPrice > 0 ? (((CurrentRent * 12) - OperatingExpenses) / PropertyPrice) * 100 : 0;
             }
         }
 
@@ -61,7 +65,7 @@ namespace tbackendgp.Models
         {
             get
             {
-                return PropertyPrice * (1 + AppreciationRate);
+                return PropertyPrice > 0 ? PropertyPrice * (1 + AppreciationRate) : PropertyPrice;
             }
         }
 
@@ -69,7 +73,7 @@ namespace tbackendgp.Models
         {
             get
             {
-                return NewPropertyPrice - PropertyPrice;
+                return PropertyPrice > 0 ? NewPropertyPrice - PropertyPrice : 0;
             }
         }
 
@@ -77,7 +81,15 @@ namespace tbackendgp.Models
         {
             get
             {
-                return PropertyPrice == 0 ? 0 : (((CurrentRent * 12) + AppreciationValue) / PropertyPrice) * 100;
+                return PropertyPrice > 0 ? (((CurrentRent * 12) + AppreciationValue) / PropertyPrice) * 100 : 0;
+            }
+        }
+
+        public double yearlyInvestmentReturn
+        {
+            get
+            {
+                return PropertyPrice > 0 ? (NetRentalIncome + (AppreciationValue / PropertyPrice)) * 100 : 0;
             }
         }
 
@@ -85,7 +97,7 @@ namespace tbackendgp.Models
         {
             get
             {
-                return CurrentRent * 12;
+                return CurrentRent > 0 ? CurrentRent * 12 : 0;
             }
         }
 
@@ -93,7 +105,7 @@ namespace tbackendgp.Models
         {
             get
             {
-                return (AnnualGrossRent - (ServiceFees + ManagementFees + MaintenanceFees)) + AppreciationValue;
+                return PropertyPrice > 0 ? (AnnualGrossRent - (ServiceFees + ManagementFees + MaintenanceFees)) + AppreciationValue : 0;
             }
         }
 
@@ -101,7 +113,7 @@ namespace tbackendgp.Models
         {
             get
             {
-                return PropertyPrice == 0 ? 0 : ((NewPropertyPrice - PropertyPrice) / PropertyPrice) * 100;
+                return PropertyPrice > 0 ? ((NewPropertyPrice - PropertyPrice) / PropertyPrice) * 100 : 0;
             }
         }
 
@@ -109,7 +121,7 @@ namespace tbackendgp.Models
         {
             get
             {
-                return PropertyPrice * (1 - (double)FundingPercentage);
+                return PropertyPrice > 0 ? PropertyPrice * (1 - (double)FundingPercentage) : 0;
             }
         }
 

@@ -53,32 +53,6 @@
   },
   {
     "ContainingType": "tbackendgp.Controllers.PropertyController",
-    "Method": "CreateProperty",
-    "RelativePath": "api/Property",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "tbackendgp.DTOs.PropertyDTO",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "tbackendgp.Models.Property",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "tbackendgp.Controllers.PropertyController",
     "Method": "GetPropertyById",
     "RelativePath": "api/Property/{id}",
     "HttpMethod": "GET",
@@ -117,9 +91,114 @@
         "IsRequired": true
       },
       {
-        "Name": "dto",
-        "Type": "tbackendgp.DTOs.PropertyDTO",
-        "IsRequired": true
+        "Name": "PropertyName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "NumOfRooms",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "NumOfBathrooms",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "FloorNumber",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyOverview",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyArea",
+        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ImageUrl",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyAddress.Street",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyAddress.City",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyAddress.State",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyAddress.Country",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyLongitude",
+        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyLatitude",
+        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyPrice",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "CurrentRent",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "ServiceFees",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "MaintenanceFees",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "ManagementFees",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "OperatingExpenses",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "AppreciationRate",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "imageFile",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -139,6 +218,137 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "tbackendgp.Controllers.PropertyController",
+    "Method": "CreateProperty",
+    "RelativePath": "api/Property/create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "PropertyName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "NumOfRooms",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "NumOfBathrooms",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "FloorNumber",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyOverview",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyArea",
+        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ImageUrl",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyAddress.Street",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyAddress.City",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyAddress.State",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyAddress.Country",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyLongitude",
+        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyLatitude",
+        "Type": "System.Nullable\u00601[[System.Double, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PropertyPrice",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "CurrentRent",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "ServiceFees",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "MaintenanceFees",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "ManagementFees",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "OperatingExpenses",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "AppreciationRate",
+        "Type": "System.Double",
+        "IsRequired": false
+      },
+      {
+        "Name": "imageFile",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "tbackendgp.Models.Property",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "tbackendgp.Controllers.PropertyOfferController",
